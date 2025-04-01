@@ -1,0 +1,6 @@
+[submodule "rag-mcp"]
+	path = rag-mcp
+	url = https://github.com/poorwym/rag-mcp.git
+[submodule "web2embeddings"]
+	path = web2embeddings
+	url = https://github.com/poorwym/web2embeddings.git
