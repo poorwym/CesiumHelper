@@ -2,13 +2,18 @@
 
 本文档详细介绍了系统中各个节点的功能、输入和输出。
 
-## 基础节点 (BaseNode)
+## 基础节点 (Node)
 
 所有节点的基类，定义了基本的节点接口。
 
 ### 输入
 - `node_id`: 节点的唯一标识符
 - `config`: 节点的配置字典（可选）
+
+### 方法
+- `process(data: dict) -> dict`: 抽象方法，所有子类必须实现
+- `print_config()`: 打印节点配置信息
+- `print_node_id()`: 打印节点ID
 
 ## LLM节点 (LLMNode)
 
@@ -18,29 +23,39 @@
 - `model_name`: 模型名称（默认：gpt-4）
 - `openai_api_key`: OpenAI API密钥
 - `temperature`: 温度参数（默认：0）
-- `base_url`: API基础URL
+- `base_url`: API基础URL（默认：https://api.chatanywhere.tech/v1）
 - `prompt_template`: 自定义提示词模板（可选）
 
 ### Prompt模板
 LLM节点支持自定义提示词模板，可以通过配置参数`prompt_template`来设置。模板中可以使用以下变量：
 - `{context}`: 上下文信息
-- `{user_query}`: 用户问题
+- `{original_user_query}`: 用户问题
 
 默认模板如下：
 ```
-基于以下上下文回答用户问题：
+请基于以下上下文回答用户关于Cesium的问题：
+
 上下文:
 {context}
 
 问题:
-{user_query}
+{original_user_query}
+
+请使用Markdown格式来组织你的回答，包括：
+1. 使用适当的标题层级(##, ###)
+2. 使用代码块(```)展示代码示例
+3. 使用列表和表格来组织信息
+4. 对重要概念使用粗体或斜体
+5. 使用适当的分隔符分隔不同部分
+
+请确保你的回答清晰、准确且容易理解。如果上下文中没有足够信息，请明确指出。
 ```
 
 ### 输入
 ```python
 {
     "context": "上下文信息",
-    "user_query": "用户问题"
+    "original_user_query": "用户问题"
 }
 ```
 
@@ -57,7 +72,7 @@ LLM节点支持自定义提示词模板，可以通过配置参数`prompt_templa
 
 ### 配置参数
 - 继承LLMNode的所有配置参数
-- `prompt_template`: 专门用于API查询的提示词模板（有默认值）
+- 自动设置专门用于API查询的提示词模板（覆盖LLMNode的模板）
 
 ### Prompt模板
 默认模板如下：
@@ -83,7 +98,8 @@ LLM节点支持自定义提示词模板，可以通过配置参数`prompt_templa
 ```python
 {
     "api_description": "分析出的API描述",
-    "original_user_query": "原始用户查询"
+    "original_user_query": "原始用户查询",
+    "user_query": "用户的查询"
 }
 ```
 
@@ -94,13 +110,14 @@ LLM节点支持自定义提示词模板，可以通过配置参数`prompt_templa
 ### 配置参数
 - `model_name`: 模型名称（默认：text-embedding-ada-002）
 - `openai_api_key`: OpenAI API密钥
-- `base_url`: API基础URL
+- `base_url`: API基础URL（默认：https://api.chatanywhere.tech/v1）
 
 ### 输入
 ```python
 {
     "api_description": "需要转换为向量的API描述",
-    "original_user_query": "原始用户查询"
+    "original_user_query": "原始用户查询",
+    "user_query": "用户查询"
 }
 ```
 
@@ -108,7 +125,8 @@ LLM节点支持自定义提示词模板，可以通过配置参数`prompt_templa
 ```python
 {
     "embeddings": "API描述的向量表示列表",
-    "original_user_query": "原始用户查询"
+    "original_user_query": "原始用户查询",
+    "user_query": "用户查询"
 }
 ```
 
@@ -123,7 +141,8 @@ LLM节点支持自定义提示词模板，可以通过配置参数`prompt_templa
 ```python
 {
     "embeddings": "查询向量列表",
-    "original_user_query": "原始用户查询"
+    "original_user_query": "原始用户查询",
+    "user_query": "用户查询"
 }
 ```
 
@@ -131,7 +150,8 @@ LLM节点支持自定义提示词模板，可以通过配置参数`prompt_templa
 ```python
 {
     "retrieved_docs": "检索到的文档列表",
-    "original_user_query": "原始用户查询"
+    "original_user_query": "原始用户查询",
+    "user_query": "用户查询"
 }
 ```
 
@@ -143,7 +163,8 @@ LLM节点支持自定义提示词模板，可以通过配置参数`prompt_templa
 ```python
 {
     "retrieved_docs": "检索到的文档列表",
-    "original_user_query": "原始用户查询"
+    "original_user_query": "原始用户查询",
+    "user_query": "用户查询"
 }
 ```
 
@@ -151,7 +172,8 @@ LLM节点支持自定义提示词模板，可以通过配置参数`prompt_templa
 ```python
 {
     "context": "处理后的文档内容",
-    "original_user_query": "原始用户查询"
+    "original_user_query": "原始用户查询",
+    "user_query": "用户查询"
 }
 ```
 

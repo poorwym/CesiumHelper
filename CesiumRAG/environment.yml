@@ -7,6 +7,8 @@ dependencies:
   - pip
   - pip:
     - langchain
+    - langchain-openai
+    - langchain-community
     - chromadb
     - openai
     - unstructured
@@ -14,4 +16,14 @@ dependencies:
     - pdf2image
     - pytesseract
     - pdfminer.six
-    - markdown 
+    - markdown
+    - tiktoken
+    - faiss-cpu
+    - transformers
+    - sentence-transformers
+    - tenacity
+    - numpy
+    - pandas
+    - PyQt5
+    - markdown
+    - pygments 

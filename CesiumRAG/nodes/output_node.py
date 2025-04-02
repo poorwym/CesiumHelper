@@ -13,7 +13,7 @@ class OutputNode(Node):
         answer = data.get("answer", "")
         
         # 这里可以做一些后处理，例如Markdown转换，或加上系统回答前缀等等
-        final_output = f"系统回答:\n{answer}"
+        final_output = f"{answer}"
 
         return {
             "final_output": final_output

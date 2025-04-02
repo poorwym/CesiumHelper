@@ -16,14 +16,25 @@ class LLMNode(Node):
         self.base_url = self.config.get("base_url", "https://api.chatanywhere.tech/v1")
         
         # 从config读取prompt模板，如果没有则使用默认模板
-        self.prompt_template = self.config.get("prompt_template", 
-            """基于以下上下文回答用户问题：
-            上下文:
-            {context}
+        default_prompt = """请基于以下上下文回答用户关于Cesium的问题：
 
-            问题:
-            {original_user_query}
-            """)
+                        上下文:
+                        {context}
+
+                        问题:
+                        {original_user_query}
+
+                        请使用Markdown格式来组织你的回答，包括：
+                        1. 使用适当的标题层级(##, ###)
+                        2. 使用代码块(```)展示代码示例
+                        3. 使用列表和表格来组织信息
+                        4. 对重要概念使用粗体或斜体
+                        5. 使用适当的分隔符分隔不同部分
+
+                        请确保你的回答清晰、准确且容易理解。如果上下文中没有足够信息，请明确指出。
+                        """
+        
+        self.prompt_template = self.config.get("prompt_template", default_prompt)
         
         # 初始化prompt模板
         self.prompt = PromptTemplate(
