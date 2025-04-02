@@ -1,12 +1,15 @@
 import os
+from dotenv import load_dotenv
 from langchain_community.document_loaders import DirectoryLoader, TextLoader, UnstructuredPDFLoader, UnstructuredWordDocumentLoader, UnstructuredMarkdownLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 import openai
 
+# 加载环境变量
+load_dotenv()
+
 # 设置 OpenAI API 密钥和基础 URL
-os.environ["OPENAI_API_KEY"] = "sk-B5nG8pj6P2sIKGDJY0QyUhGn8X2OdODa5zDHkKUnPdX2XntB"
 openai.base_url = "https://api.chatanywhere.tech/v1"
 
 # 1. 加载文件夹中的所有文档
@@ -37,8 +40,8 @@ def split_documents(docs, chunk_size=500, chunk_overlap=50):
 def build_vectorstore(docs, persist_path="./chroma_db"):
     embeddings = OpenAIEmbeddings(
         model="text-embedding-3-small",
-        api_key="sk-B5nG8pj6P2sIKGDJY0QyUhGn8X2OdODa5zDHkKUnPdX2XntB",
-        base_url="https://api.chatanywhere.tech/v1"
+        base_url="https://api.chatanywhere.tech/v1",
+        api_key=os.getenv("OPENAI_API_KEY")
     )
     vectordb = Chroma.from_documents(documents=docs, embedding=embeddings, persist_directory=persist_path)
     vectordb.persist()

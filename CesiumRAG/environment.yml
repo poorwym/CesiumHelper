@@ -27,3 +27,4 @@ dependencies:
     - PyQt5
     - markdown
     - pygments 
+    - python-dotenv

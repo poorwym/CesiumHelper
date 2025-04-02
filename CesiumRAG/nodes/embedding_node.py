@@ -1,28 +1,31 @@
 # nodes/embedding_node.py
 
+import os
+from dotenv import load_dotenv
 from .base_node import Node
 from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import Chroma
+from typing import Dict, Any
 # 这里的 embedding 相关引入，例如 from langchain_openai import OpenAIEmbeddings
 # 或者你自己封装的embedding类
 
+# 加载环境变量
+load_dotenv()
+
 class EmbeddingNode(Node):
-    def __init__(self, node_id: str, config: dict = None):
+    def __init__(self, node_id: str, config: Dict[str, Any]):
         """
         继承自BaseNode,初始化embedding相关。
         """
         super().__init__(node_id, config)
         # 在config中可能有 'model'、'openai_api_key' 等
-        self.model_name = self.config.get("model_name", "text-embedding-ada-002")
-        self.api_key = self.config.get("openai_api_key", "")
-        self.base_url = self.config.get("base_url", "https://api.chatanywhere.tech/v1")
-        
-        # 初始化embedding模型
-        self.embedding_model = OpenAIEmbeddings(
-            model=self.model_name,
-            openai_api_key=self.api_key,
+        self.model = config.get("model", "text-embedding-3-small")
+        self.base_url = config.get("base_url", "https://api.chatanywhere.tech/v1")
+        self.embeddings = OpenAIEmbeddings(
+            model=self.model,
             base_url=self.base_url
-            # 其它可配置参数
         )
+        self.vectordb = None
 
     def process(self, data: dict) -> dict:
         """
@@ -41,7 +44,7 @@ class EmbeddingNode(Node):
         apis = api_description.split(",")
         embeddings = []
         for api in apis:
-            embeddings.append(self.embedding_model.embed_query(api))
+            embeddings.append(self.embeddings.embed_query(api))
         
         return {
             "embeddings": embeddings,

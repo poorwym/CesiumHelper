@@ -2,3 +2,10 @@ chroma_openai/
 __pycache__/
 curated/
 
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+

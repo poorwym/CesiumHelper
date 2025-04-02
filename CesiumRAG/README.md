@@ -20,6 +20,9 @@ conda env create -f environment.yml
 conda activate cesiumrag
 ```
 
+创建环境变量 OPENAI_API_KEY，值为openai的apikey。
+（可以在当前目录建立.env文件）
+
 ## 配置文件
 
 项目使用`config.json`进行配置，主要包含以下设置：
