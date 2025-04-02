@@ -1,0 +1,17 @@
+name: cesiumrag
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+    - langchain
+    - chromadb
+    - openai
+    - unstructured
+    - python-docx
+    - pdf2image
+    - pytesseract
+    - pdfminer.six
+    - markdown 

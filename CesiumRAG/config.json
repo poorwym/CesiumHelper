@@ -1,0 +1,18 @@
+{
+    "embedding": {
+        "model_name": "text-embedding-3-small",
+        "openai_api_key": "sk-B5nG8pj6P2sIKGDJY0QyUhGn8X2OdODa5zDHkKUnPdX2XntB",
+        "base_url": "https://api.chatanywhere.tech/v1"
+    },
+    "vectordb": {
+        "persist_directory": "./chroma_openai",
+        "base_url": "https://api.chatanywhere.tech/v1"
+    },
+    "llm": {
+        "model_name": "gpt-4o",
+        "openai_api_key": "sk-B5nG8pj6P2sIKGDJY0QyUhGn8X2OdODa5zDHkKUnPdX2XntB",
+        "base_url": "https://api.chatanywhere.tech/v1",
+        "temperature": 0,
+        "prompt_template": "cesium的api变化极快，不管你对你的答案有多自信，请根据查询到的上下文回答相关问题,不要给出任何context中没有出现的api：\n上下文:\n{context}\n\n问题:\n{original_user_query}"
+    }
+} 
