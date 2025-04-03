@@ -10,7 +10,7 @@ class OutputNode(Node):
         """
         最终输出节点，可进行格式化或直接返回给前端
         """
-        answer = data.get("answer", "")
+        answer = data.get("input", "")
         
         # 这里可以做一些后处理，例如Markdown转换，或加上系统回答前缀等等
         final_output = f"{answer}"

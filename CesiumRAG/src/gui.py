@@ -13,21 +13,15 @@ from PyQt5.QtGui import QFont, QIcon, QPalette, QColor
 # 导入flow模块
 import flow
 
-# 加载配置文件
-def load_config():
-    with open('config.json', 'r', encoding='utf-8') as f:
-        return json.load(f)
-
 # 处理线程
 class ProcessingThread(QThread):
     result_ready = pyqtSignal(str)
     status_update = pyqtSignal(str)
     progress_update = pyqtSignal(int)
     
-    def __init__(self, query, config):
+    def __init__(self, query):
         super().__init__()
         self.query = query
-        self.config = config
         
     def run(self):
         try:
@@ -35,7 +29,6 @@ class ProcessingThread(QThread):
             # 传入状态和进度回调函数
             result = flow.process_query(
                 self.query, 
-                self.config,
                 status_callback=self.status_update.emit,
                 progress_callback=self.progress_update.emit
             )
@@ -103,7 +96,6 @@ class LoadingAnimation(QWidget):
 class CesiumRagGUI(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.config = load_config()
         self.set_style()
         self.initUI()
         
@@ -297,7 +289,7 @@ class CesiumRagGUI(QMainWindow):
         self.loading_animation.start()
         
         # 创建处理线程
-        self.processing_thread = ProcessingThread(query, self.config)
+        self.processing_thread = ProcessingThread(query)
         self.processing_thread.result_ready.connect(self.update_result)
         self.processing_thread.status_update.connect(self.update_status)
         self.processing_thread.progress_update.connect(self.update_progress)

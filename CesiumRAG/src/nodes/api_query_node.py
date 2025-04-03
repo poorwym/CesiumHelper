@@ -1,5 +1,6 @@
 from .llm_node import LLMNode
 from langchain.prompts import PromptTemplate
+import time
 
 class APIQueryNode(LLMNode):
     def __init__(self, node_id: str, config: dict = None):
@@ -26,7 +27,7 @@ class APIQueryNode(LLMNode):
         处理用户查询，提取 API 相关的描述
         """
         user_query = data.get("user_query", "")
-        original_user_query = data.get("original_user_query", user_query)
+        request_id = str(int(time.time() * 1000))
         
         # 使用 prompt 模板生成完整 prompt
         formatted_prompt = self.prompt.format(
@@ -42,6 +43,6 @@ class APIQueryNode(LLMNode):
         # 将原始查询和 API 描述一起返回
         return {
             "api_description": api_description,
-            "original_user_query": original_user_query,
-            "user_query": user_query
+            "answer": api_description,
+            "request_id": request_id
         } 

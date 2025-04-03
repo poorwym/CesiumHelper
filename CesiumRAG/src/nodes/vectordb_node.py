@@ -3,7 +3,6 @@
 from .base_node import Node
 from langchain_chroma import Chroma
 # import你的Chroma类或其它向量数据库
-
 class VectorDBNode(Node):
     def __init__(self, node_id: str, config: dict = None):
         """
@@ -25,8 +24,6 @@ class VectorDBNode(Node):
         3. 返回检索到的文档
         """
         embeddings = data.get("embeddings")
-        original_user_query = data.get("original_user_query", "")
-        user_query = data.get("user_query", "")
         
         if embeddings is None:
             raise ValueError("No embeddings found in input data.")
@@ -38,6 +35,4 @@ class VectorDBNode(Node):
         
         return {
             "retrieved_docs": docs,
-            "original_user_query": original_user_query,
-            "user_query": user_query
         }

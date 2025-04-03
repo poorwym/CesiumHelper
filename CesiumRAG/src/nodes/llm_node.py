@@ -6,6 +6,7 @@ from .base_node import Node
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate, ChatPromptTemplate
 from typing import Dict, Any
+import time
 
 # 加载环境变量
 load_dotenv()
@@ -18,7 +19,7 @@ class LLMNode(Node):
         self.model = config.get("model", "gpt-4-turbo-preview")
         self.temperature = config.get("temperature", 0.7)
         self.base_url = config.get("base_url", "https://api.chatanywhere.tech/v1")
-        self.prompt_template = config.get("prompt_template", "")
+        self.prompt_template = config.get("prompt_template", "{user_query}")
         
         # 初始化ChatOpenAI
         self.llm = ChatOpenAI(
@@ -37,12 +38,12 @@ class LLMNode(Node):
         用context和original_user_query组合prompt，调用LLM生成回答
         """
         context = data.get("context", "")
-        original_user_query = data.get("original_user_query", "")
+        request_id = str(int(time.time() * 1000))
 
         # 使用prompt模板生成完整prompt
         formatted_prompt = self.prompt.format(
             context=context,
-            original_user_query=original_user_query
+            user_query=data.get("user_query", "")
         )
 
         response = self.llm.invoke(formatted_prompt)
@@ -51,7 +52,8 @@ class LLMNode(Node):
         answer = response.content if hasattr(response, 'content') else str(response)
 
         return {
-            "answer": answer
+            "answer": answer,
+            "request_id": request_id
         }
     
 

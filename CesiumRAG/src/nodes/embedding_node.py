@@ -34,8 +34,6 @@ class EmbeddingNode(Node):
         3. 返回新的dict
         """
         api_description = data.get("api_description", "")
-        original_user_query = data.get("original_user_query", "")
-        user_query = data.get("user_query", "")
         
         # 处理AIMessage对象
         if hasattr(api_description, 'content'):
@@ -48,6 +46,5 @@ class EmbeddingNode(Node):
         
         return {
             "embeddings": embeddings,
-            "original_user_query": original_user_query,
-            "user_query": user_query
+            "api_description": api_description
         }

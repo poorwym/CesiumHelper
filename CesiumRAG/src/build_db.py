@@ -48,8 +48,8 @@ def build_vectorstore(docs, persist_path="./chroma_db"):
     return vectordb
 
 # === 主流程 ===
-folder_path = "./curated"  # 替换为你自己的文档文件夹路径
-persist_path = "./chroma_openai"
+folder_path = "./data/curated"  # 替换为你自己的文档文件夹路径
+persist_path = "./data/chroma_openai"
 
 print("加载文件...")
 raw_docs = load_documents_from_folder(folder_path)
