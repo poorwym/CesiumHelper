@@ -1,16 +1,10 @@
 # nodes/embedding_node.py
 
-import os
-from dotenv import load_dotenv
 from .base_node import Node
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import Chroma
 from typing import Dict, Any
 # 这里的 embedding 相关引入，例如 from langchain_openai import OpenAIEmbeddings
 # 或者你自己封装的embedding类
-
-# 加载环境变量
-load_dotenv()
 
 class EmbeddingNode(Node):
     def __init__(self, node_id: str, config: Dict[str, Any]):

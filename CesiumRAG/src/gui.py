@@ -840,6 +840,8 @@ class CesiumRagGUI(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
+    app_icon = QIcon("assets/icon.png")
+    app.setWindowIcon(app_icon)
     ex = CesiumRagGUI()
     sys.exit(app.exec_())
 

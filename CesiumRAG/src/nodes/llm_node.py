@@ -1,15 +1,10 @@
 # nodes/llm_node.py
 
-import os
-from dotenv import load_dotenv
 from .base_node import Node
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate, ChatPromptTemplate
 from typing import Dict, Any
 import time
-
-# 加载环境变量
-load_dotenv()
 
 class LLMNode(Node):
     def __init__(self, node_id: str, config: Dict[str, Any]):
