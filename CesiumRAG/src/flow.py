@@ -51,11 +51,24 @@ def process_query(query, status_callback=None, progress_callback=None, conversat
     if status_callback: status_callback("正在分析问题...")
     if progress_callback: progress_callback(10)
 
-    # 获取对话
+    # 获取对话管理器
     conversations_manager = ConversationsManager()
+    
+    # 如果conversation_id为None，创建新对话
+    if conversation_id is None:
+        conversation_id = conversations_manager.create_new_conversation()
+        print("创建新对话:", conversation_id)
+    
+    # 获取对话
     conversation = conversations_manager.get_conversation(conversation_id)
+    if conversation is None:
+        # 如果对话不存在，创建新对话
+        conversation_id = conversations_manager.create_new_conversation()
+        conversation = conversations_manager.get_conversation(conversation_id)
+        print("对话不存在，创建新对话:", conversation_id)
+    
     # 获取对话中的消息
-    title = conversation.get("title")
+    title = conversation.get("title", "新对话")
     messages = conversation.get("messages", [])
 
     print("当前位于对话:", conversation_id)
@@ -135,11 +148,13 @@ def process_query(query, status_callback=None, progress_callback=None, conversat
         ]
     })
 
-    if(title[0:3] == "新对话"):
+    # 检查标题是否需要更新
+    if title and title.startswith("新对话"):
         # 更新对话标题
-        title = generate_title(conversation_id, original_user_query+"\n"+final_result["final_output"])
-        conversations_manager.change_conversation_title_by_id(conversation_id, title)
+        new_title = generate_title(conversation_id, original_user_query+"\n"+final_result["final_output"])
+        conversations_manager.change_conversation_title_by_id(conversation_id, new_title)
     if progress_callback: progress_callback(100)
+    print("="*100)
     return final_result["final_output"]
 
 def status_callback(status_text):
@@ -160,24 +175,20 @@ def progress_callback(progress):
     """
     print(f"进度: {progress}%")
 
-
-def main():
-    # 初始化对话管理器
-    conversations_manager = ConversationsManager()
-    # 获取所有对话
-    all_conversations = conversations_manager.get_all_conversations()
-    # 打印所有对话的标题
-    for conversation in all_conversations:
-        print("id:", conversation.get("id"))
-        print("title:", conversation.get("title"))
-        print("="*100)
-    conversation_id = str(input("请输入对话id(没有默认创建新对话):"))
-    if conversation_id == "":
-        conversation_id = conversations_manager.create_new_conversation()
-    query = str(input("请输入你的问题："))
-    result = process_query(query, status_callback, progress_callback, conversation_id)
-    print(result)
-
 if __name__ == "__main__":
     while True:
-        main()
+        # 初始化对话管理器
+        conversations_manager = ConversationsManager()
+        # 获取所有对话
+        all_conversations = conversations_manager.get_all_conversations()
+        # 打印所有对话的标题
+        for conversation in all_conversations:
+            print("id:", conversation.get("id"))
+            print("title:", conversation.get("title"))
+            print("="*100)
+        conversation_id = str(input("请输入对话id(没有默认创建新对话):"))
+        if conversation_id == "":
+            conversation_id = conversations_manager.create_new_conversation()
+        query = str(input("请输入你的问题："))
+        result = process_query(query, status_callback, progress_callback, conversation_id)
+        print(result)
