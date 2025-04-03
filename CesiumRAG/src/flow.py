@@ -13,9 +13,28 @@ from nodes.output_node import OutputNode
 from nodes.api_query_node import APIQueryNode
 
 from utils.config_loader import ConfigLoader
+from conversations_manager import ConversationsManager
+from datetime import datetime
+
+def generate_title(conversation_id, context):
+    config = ConfigLoader()
+    title_generator_model = config.get("title_generator.model")
+    title_generator_prompt_template = config.get("title_generator.prompt_template")
+    title_generator_api_key = config.get("title_generator.openai_api_key")
+    title_generator_base_url = config.get("title_generator.base_url")
+    title_generator_node = LLMNode(node_id="title_generator_node", config={"model": title_generator_model, "base_url": title_generator_base_url, "prompt_template": title_generator_prompt_template, "api_key": title_generator_api_key})
+    input_data = {
+        "context": context,
+        "user_query": ""
+    }
+    data_after_llm = title_generator_node.process(input_data)
+    title = data_after_llm["answer"]
+    print("生成标题:", title)
+    return title
+
 
 # 添加用于从GUI调用的函数
-def process_query(query, status_callback=None, progress_callback=None):
+def process_query(query, status_callback=None, progress_callback=None, conversation_id=None):
     """
     处理用户查询并返回结果
     
@@ -23,6 +42,7 @@ def process_query(query, status_callback=None, progress_callback=None):
     query: 用户输入的查询
     status_callback: 状态更新回调函数，接收状态文本
     progress_callback: 进度更新回调函数，接收进度百分比
+    conversation_id: 对话id
     
     返回:
     final_output: 最终输出结果
@@ -30,12 +50,32 @@ def process_query(query, status_callback=None, progress_callback=None):
     # 更新状态
     if status_callback: status_callback("正在分析问题...")
     if progress_callback: progress_callback(10)
+
+    # 获取对话
+    conversations_manager = ConversationsManager()
+    conversation = conversations_manager.get_conversation(conversation_id)
+    # 获取对话中的消息
+    title = conversation.get("title")
+    messages = conversation.get("messages", [])
+
+    print("当前位于对话:", conversation_id)
+    print("当前对话消息:", messages)
+
+    context = ""
     
+    for message in messages:
+        context += f"{message.get('role')}: {message.get('content')}\n"
+
+    if(len(context) > 10005):
+        context = context[-10000:]
     config = ConfigLoader()
     # 获取 LLM 模型名
     llm_model_name = config.get("llm.model")
+    # 获取 embedding 模型名
     embedding_model_name = config.get("embedding.model")
+    # 获取 API 基础 URL
     base_url = config.get("llm.base_url")
+    # 获取 prompt 模板
     prompt_template = config.get("llm.prompt_template")
     # 获取向量库存储路径（返回绝对路径）
     persist_dir = config.get_path("vectordb.persist_directory")
@@ -52,7 +92,7 @@ def process_query(query, status_callback=None, progress_callback=None):
 
     # 构造输入
     input_data = {
-        "context": "",
+        "context": context,
         "user_query": query,
     }
 
@@ -80,12 +120,25 @@ def process_query(query, status_callback=None, progress_callback=None):
     
     if status_callback: status_callback("AI正在生成回答...")
     if progress_callback: progress_callback(80)
-    context = data_after_retriever["context"]
+    context += f"检索结果: {data_after_retriever['context']}\n"
     data_after_llm = llm_node.process({"context": context, "user_query": original_user_query})
     
     if progress_callback: progress_callback(95)
     final_result = output_node.process({"input": data_after_llm["answer"]})
-    
+
+    # 更新对话
+    conversations_manager.update_conversation(conversation_id, {
+        "messages": [
+            *messages,
+            {"role": "user", "content": original_user_query, "timestamp": datetime.now().isoformat()},
+            {"role": "assistant", "content": final_result["final_output"], "timestamp": datetime.now().isoformat()}
+        ]
+    })
+
+    if(title[0:3] == "新对话"):
+        # 更新对话标题
+        title = generate_title(conversation_id, original_user_query+"\n"+final_result["final_output"])
+        conversations_manager.change_conversation_title_by_id(conversation_id, title)
     if progress_callback: progress_callback(100)
     return final_result["final_output"]
 
@@ -109,9 +162,22 @@ def progress_callback(progress):
 
 
 def main():
+    # 初始化对话管理器
+    conversations_manager = ConversationsManager()
+    # 获取所有对话
+    all_conversations = conversations_manager.get_all_conversations()
+    # 打印所有对话的标题
+    for conversation in all_conversations:
+        print("id:", conversation.get("id"))
+        print("title:", conversation.get("title"))
+        print("="*100)
+    conversation_id = str(input("请输入对话id(没有默认创建新对话):"))
+    if conversation_id == "":
+        conversation_id = conversations_manager.create_new_conversation()
     query = str(input("请输入你的问题："))
-    result = process_query(query, status_callback, progress_callback)
+    result = process_query(query, status_callback, progress_callback, conversation_id)
     print(result)
 
 if __name__ == "__main__":
-    main()
+    while True:
+        main()
