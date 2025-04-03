@@ -4,27 +4,29 @@ channels:
   - defaults
 dependencies:
   - python=3.10
+  - langchain
+  - openai
+  - chromadb
+  - unstructured
+  - python-docx
+  - pdf2image
+  - pytesseract
+  - pdfminer.six
+  - markdown
+  - tiktoken
+  - faiss-cpu
+  - transformers
+  - sentence-transformers
+  - tenacity
+  - numpy
+  - pandas
+  - pyqt
+  - markdown
+  - pygments 
+  - python-dotenv
+  - python-markdown-math
+  - pyqtwebengine
   - pip
-  - pip:
-    - langchain
-    - langchain-openai
-    - langchain-community
-    - chromadb
-    - openai
-    - unstructured
-    - python-docx
-    - pdf2image
-    - pytesseract
-    - pdfminer.six
-    - markdown
-    - tiktoken
-    - faiss-cpu
-    - transformers
-    - sentence-transformers
-    - tenacity
-    - numpy
-    - pandas
-    - PyQt5
-    - markdown
-    - pygments 
-    - python-dotenv
+  - langchain-openai
+  - langchain-community
+  - langchain-chroma

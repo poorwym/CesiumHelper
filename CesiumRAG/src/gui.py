@@ -4,13 +4,15 @@
 import sys
 import json
 import markdown
+from mdx_math import MathExtension
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                             QHBoxLayout, QTextEdit, QPushButton, QLabel, 
-                            QSplitter, QFrame, QStyleFactory, QProgressBar, QTextBrowser,
+                            QSplitter, QFrame, QStyleFactory, QProgressBar,
                             QListWidget, QListWidgetItem, QMenu, QAction, QInputDialog,
                             QMessageBox, QDialog, QLineEdit, QDateEdit, QComboBox, QDialogButtonBox)
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize, QUrl
 from PyQt5.QtGui import QFont, QIcon, QPalette, QColor
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 # 导入flow模块
 import flow
@@ -366,35 +368,9 @@ class CesiumRagGUI(QMainWindow):
         chat_area_label = QLabel('对话内容:')
         content_layout.addWidget(chat_area_label)
         
-        # 创建统一的对话显示区域
-        self.chat_display = QTextBrowser()
-        self.chat_display.setOpenExternalLinks(True)
-        self.chat_display.setPlaceholderText('对话内容将显示在这里...')
-        self.chat_display.setStyleSheet("""
-            QTextBrowser {
-                background-color: #fff5f8;
-                color: #5a5a5a;
-                border: 1px solid #ffcce0;
-                border-radius: 5px;
-                padding: 10px;
-                selection-background-color: #ffd6e5;
-            }
-            QTextBrowser a {
-                color: #ff7eb3;
-            }
-            QTextBrowser code {
-                background-color: #ffecf1;
-                padding: 2px 5px;
-                border-radius: 3px;
-                font-family: 'Consolas', 'Courier New', monospace;
-            }
-            QTextBrowser pre {
-                background-color: #ffecf1;
-                padding: 10px;
-                border-radius: 5px;
-                overflow: auto;
-            }
-        """)
+        # 创建统一的对话显示区域 - 使用QWebEngineView代替QTextBrowser
+        self.chat_display = QWebEngineView()
+        self.chat_display.setMinimumHeight(300)
         content_layout.addWidget(self.chat_display)
         
         # 添加状态指示
@@ -494,7 +470,7 @@ class CesiumRagGUI(QMainWindow):
         # 更新UI
         self.conversation_title_label.setText(conversation['title'])
         # 清空聊天显示区域
-        self.chat_display.clear()
+        self.chat_display.setHtml("<p>还没有对话消息...</p>")
         # 更新对话列表
         self.load_conversations()
         
@@ -611,82 +587,114 @@ class CesiumRagGUI(QMainWindow):
         self.update_chat_display(conversation)
     
     def update_chat_display(self, conversation):
-        # 清空聊天显示
-        self.chat_display.clear()
-        
         # 获取消息
         messages = conversation.get('messages', [])
         
         # 如果没有消息
         if not messages:
-            self.chat_display.setPlainText("还没有对话消息...")
+            self.chat_display.setHtml("<p>还没有对话消息...</p>")
             return
             
         # 构建HTML内容
         html_content = """
-        <style>
-            .message-container { margin-bottom: 20px; }
-            .user-message { 
-                background-color: #ffecf1; 
-                color: #5a5a5a; 
-                padding: 10px 15px;
-                border-radius: 8px;
-                margin-left: 20px;
-                margin-right: 5px;
-                border: 1px solid #ffcce0;
-            }
-            .assistant-message { 
-                background-color: #e8f5e9; 
-                color: #5a5a5a; 
-                padding: 10px 15px;
-                border-radius: 8px;
-                margin-left: 5px;
-                margin-right: 20px;
-                border: 1px solid #c8e6c9;
-            }
-            .timestamp {
-                font-size: 0.8em;
-                color: #ff9eb6;
-                margin-top: 3px;
-                text-align: right;
-            }
-            code {
-                background-color: #fff5f8;
-                padding: 0.2em 0.4em;
-                border-radius: 3px;
-                font-family: 'Consolas', 'Courier New', monospace;
-            }
-            pre {
-                background-color: #fff5f8;
-                padding: 10px;
-                border-radius: 5px;
-                overflow: auto;
-                margin: 10px 0;
-                border: 1px solid #ffcce0;
-            }
-            pre code {
-                background-color: transparent;
-                padding: 0;
-            }
-            ol, ul {
-                padding-left: 20px;
-            }
-            table {
-                border-collapse: collapse;
-                margin: 10px 0;
-                width: 100%;
-            }
-            table, th, td {
-                border: 1px solid #ffcce0;
-            }
-            th, td {
-                padding: 8px;
-                text-align: left;
-            }
-            th {
-                background-color: #fff0f5;
-            }
-        </style>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 10px;
+                    background-color: #fff5f8;
+                }
+                .message-container { margin-bottom: 20px; }
+                .user-message { 
+                    background-color: #ffecf1; 
+                    color: #5a5a5a; 
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    margin-left: 20px;
+                    margin-right: 5px;
+                    border: 1px solid #ffcce0;
+                }
+                .assistant-message { 
+                    background-color: #e8f5e9; 
+                    color: #5a5a5a; 
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    margin-left: 5px;
+                    margin-right: 20px;
+                    border: 1px solid #c8e6c9;
+                }
+                .timestamp {
+                    font-size: 0.8em;
+                    color: #ff9eb6;
+                    margin-top: 3px;
+                    text-align: right;
+                }
+                code {
+                    background-color: #fff5f8;
+                    padding: 0.2em 0.4em;
+                    border-radius: 3px;
+                    font-family: 'Consolas', 'Courier New', monospace;
+                }
+                pre {
+                    background-color: #fff5f8;
+                    padding: 10px;
+                    border-radius: 5px;
+                    overflow: auto;
+                    margin: 10px 0;
+                    border: 1px solid #ffcce0;
+                }
+                pre code {
+                    background-color: transparent;
+                    padding: 0;
+                }
+                ol, ul {
+                    padding-left: 20px;
+                }
+                table {
+                    border-collapse: collapse;
+                    margin: 10px 0;
+                    width: 100%;
+                }
+                table, th, td {
+                    border: 1px solid #ffcce0;
+                }
+                th, td {
+                    padding: 8px;
+                    text-align: left;
+                }
+                th {
+                    background-color: #fff0f5;
+                }
+                .math {
+                    font-size: 1.1em;
+                }
+                .math-inline {
+                    display: inline-block;
+                    margin: 0 0.2em;
+                }
+                .math-display {
+                    display: block;
+                    margin: 0.5em 0;
+                    text-align: center;
+                }
+            </style>
+            <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_HTML"></script>
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    tex2jax: {
+                        inlineMath: [['$','$'], ['\\(','\\)']],
+                        displayMath: [['$$','$$'], ['\\[','\\]']],
+                        processEscapes: true
+                    }
+                });
+            </script>
+        </head>
+        <body>
         """
         
         for message in messages:
@@ -713,7 +721,8 @@ class CesiumRagGUI(QMainWindow):
                             'markdown.extensions.fenced_code',
                             'markdown.extensions.codehilite',
                             'markdown.extensions.nl2br',
-                            'markdown.extensions.sane_lists'
+                            'markdown.extensions.sane_lists',
+                            MathExtension(enable_dollar_delimiter=True)
                         ]
                     )
                 except:
@@ -730,13 +739,15 @@ class CesiumRagGUI(QMainWindow):
             </div>
             """
         
+        html_content += """
+        </body>
+        </html>
+        """
+        
         # 设置HTML内容
         self.chat_display.setHtml(html_content)
         
-        # 滚动到底部
-        self.chat_display.verticalScrollBar().setValue(
-            self.chat_display.verticalScrollBar().maximum()
-        )
+        # QWebEngineView不需要手动滚动到底部，它会自动处理
     
     def show_context_menu(self, position):
         # 获取当前选中的项

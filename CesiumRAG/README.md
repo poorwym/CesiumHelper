@@ -16,7 +16,7 @@
 
 ```bash
 # 创建并激活conda环境
-conda env create -f environment.yml
+conda env create -f configs/environment.yml
 conda activate cesiumrag
 ```
 
