@@ -39,22 +39,22 @@ conda activate cesiumrag
 
 ### 构建向量数据库
 
-在首次使用前，需要构建向量数据库,默认数据存在curated/目录下：
+在首次使用前，需要构建向量数据库,默认数据存在data/curated/目录下：
 
 ```bash
-python build_db.py
+python src/build_db.py
 ```
 
 ### 命令行交互模式
 
 ```bash
-python flow.py
+python src/flow.py
 ```
 
 ### 图形用户界面模式
 
 ```bash
-python gui.py
+python src/gui.py
 ```
 
 ## 系统架构
