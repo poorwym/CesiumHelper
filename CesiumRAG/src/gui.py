@@ -56,7 +56,7 @@ class LoadingAnimation(QWidget):
         self.setVisible(False)
         
         self.label = QLabel(self.base_text)
-        self.label.setStyleSheet("color: #42a5f5; font-weight: bold;")
+        self.label.setStyleSheet("color: #ff7eb3; font-weight: bold;")
         
         layout = QVBoxLayout()
         layout.addWidget(self.label)
@@ -66,13 +66,14 @@ class LoadingAnimation(QWidget):
         self.progress_bar.setValue(0)
         self.progress_bar.setStyleSheet("""
             QProgressBar {
-                border: 1px solid #555;
+                border: 1px solid #ffcce0;
                 border-radius: 5px;
                 text-align: center;
                 height: 10px;
+                background-color: #fff5f8;
             }
             QProgressBar::chunk {
-                background-color: #42a5f5;
+                background-color: #ff9ece;
                 border-radius: 5px;
             }
         """)
@@ -118,21 +119,21 @@ class CesiumRagGUI(QMainWindow):
         # 设置应用样式
         QApplication.setStyle(QStyleFactory.create('Fusion'))
         
-        # 自定义调色板
+        # 自定义调色板 - 清新可爱风格
         palette = QPalette()
-        palette.setColor(QPalette.Window, QColor(43, 43, 43))  # 稍微深一点的背景
-        palette.setColor(QPalette.WindowText, QColor(255, 255, 255))  # 纯白色文字
-        palette.setColor(QPalette.Base, QColor(18, 18, 18))  # 更深的输入框背景
-        palette.setColor(QPalette.AlternateBase, QColor(45, 45, 45))
-        palette.setColor(QPalette.ToolTipBase, Qt.white)
-        palette.setColor(QPalette.ToolTipText, Qt.white)
-        palette.setColor(QPalette.Text, QColor(255, 255, 255))  # 纯白色文字
-        palette.setColor(QPalette.Button, QColor(53, 53, 53))
-        palette.setColor(QPalette.ButtonText, QColor(255, 255, 255))  # 纯白色文字
-        palette.setColor(QPalette.BrightText, QColor(255, 50, 50))  # 更鲜艳的强调色
-        palette.setColor(QPalette.Link, QColor(66, 133, 244))  # 更鲜艳的链接颜色
-        palette.setColor(QPalette.Highlight, QColor(66, 133, 244))  # 更鲜艳的高亮颜色
-        palette.setColor(QPalette.HighlightedText, QColor(255, 255, 255))  # 纯白色高亮文字
+        palette.setColor(QPalette.Window, QColor(255, 242, 245))  # 淡粉色背景
+        palette.setColor(QPalette.WindowText, QColor(90, 90, 90))  # 深灰色文字
+        palette.setColor(QPalette.Base, QColor(255, 250, 250))  # 淡白粉色输入框背景
+        palette.setColor(QPalette.AlternateBase, QColor(232, 245, 252))  # 淡蓝色交替背景
+        palette.setColor(QPalette.ToolTipBase, QColor(255, 240, 245))  # 浅粉色提示背景
+        palette.setColor(QPalette.ToolTipText, QColor(90, 90, 90))  # 深灰色提示文字
+        palette.setColor(QPalette.Text, QColor(90, 90, 90))  # 深灰色文字
+        palette.setColor(QPalette.Button, QColor(210, 230, 255))  # 淡蓝色按钮
+        palette.setColor(QPalette.ButtonText, QColor(90, 90, 90))  # 深灰色按钮文字
+        palette.setColor(QPalette.BrightText, QColor(255, 105, 180))  # 热粉色强调色
+        palette.setColor(QPalette.Link, QColor(147, 196, 250))  # 宝宝蓝链接颜色
+        palette.setColor(QPalette.Highlight, QColor(183, 232, 244))  # 浅蓝色高亮颜色
+        palette.setColor(QPalette.HighlightedText, QColor(90, 90, 90))  # 深灰色高亮文字
         QApplication.setPalette(palette)
         
     def initUI(self):
@@ -167,9 +168,9 @@ class CesiumRagGUI(QMainWindow):
         self.search_input.setPlaceholderText('搜索对话...')
         self.search_input.setStyleSheet("""
             QLineEdit {
-                background-color: #1e1e1e;
-                color: white;
-                border: 1px solid #555;
+                background-color: #ffecf1;
+                color: #5a5a5a;
+                border: 1px solid #ffcce0;
                 border-radius: 5px;
                 padding: 5px;
             }
@@ -181,14 +182,14 @@ class CesiumRagGUI(QMainWindow):
         search_button = QPushButton('搜索')
         search_button.setStyleSheet("""
             QPushButton {
-                background-color: #61afef;
-                color: white;
+                background-color: #ffb6c1;
+                color: #5a5a5a;
                 border: none;
                 padding: 5px 10px;
                 border-radius: 3px;
             }
             QPushButton:hover {
-                background-color: #528bff;
+                background-color: #ffc8d6;
             }
         """)
         search_button.clicked.connect(self.filter_conversations)
@@ -200,8 +201,8 @@ class CesiumRagGUI(QMainWindow):
         new_conv_button = QPushButton('新建对话')
         new_conv_button.setStyleSheet("""
             QPushButton {
-                background-color: #4CAF50;
-                color: white;
+                background-color: #a5dda5;
+                color: #5a5a5a;
                 border: none;
                 padding: 8px 16px;
                 border-radius: 4px;
@@ -210,7 +211,7 @@ class CesiumRagGUI(QMainWindow):
                 margin-bottom: 10px;
             }
             QPushButton:hover {
-                background-color: #45a049;
+                background-color: #b8e6b8;
             }
         """)
         new_conv_button.clicked.connect(self.create_new_conversation)
@@ -220,24 +221,24 @@ class CesiumRagGUI(QMainWindow):
         self.conversation_list = QListWidget()
         self.conversation_list.setStyleSheet("""
             QListWidget {
-                background-color: #1e1e1e;
-                color: white;
-                border: 1px solid #555;
+                background-color: #fff5f8;
+                color: #5a5a5a;
+                border: 1px solid #ffcce0;
                 border-radius: 5px;
                 padding: 5px;
             }
             QListWidget::item {
-                background-color: #2d2d2d;
-                color: white;
+                background-color: #ffecf1;
+                color: #5a5a5a;
                 margin: 5px;
                 padding: 8px;
                 border-radius: 3px;
             }
             QListWidget::item:selected {
-                background-color: #3e4451;
+                background-color: #ffd6e5;
             }
             QListWidget::item:hover {
-                background-color: #353b45;
+                background-color: #ffcce0;
             }
         """)
         self.conversation_list.itemClicked.connect(self.select_conversation)
@@ -275,7 +276,7 @@ class CesiumRagGUI(QMainWindow):
         title_font.setPointSize(12)
         title_font.setBold(True)
         self.conversation_title_label.setFont(title_font)
-        self.conversation_title_label.setStyleSheet("color: #61afef;")
+        self.conversation_title_label.setStyleSheet("color: #ff7eb3;")
         content_layout.addWidget(self.conversation_title_label)
         
         # 创建输入区域
@@ -287,15 +288,15 @@ class CesiumRagGUI(QMainWindow):
         self.input_text.setFixedHeight(100)
         self.input_text.setStyleSheet("""
             QTextEdit {
-                background-color: #1e1e1e;
-                color: white;
-                border: 1px solid #555;
+                background-color: #ffecf1;
+                color: #5a5a5a;
+                border: 1px solid #ffcce0;
                 border-radius: 5px;
                 padding: 10px;
-                selection-background-color: #3e4451;
+                selection-background-color: #ffd6e5;
             }
             QTextEdit::placeholder {
-                color: #aaaaaa;
+                color: #b0b0b0;
             }
         """)
         content_layout.addWidget(self.input_text)
@@ -307,22 +308,22 @@ class CesiumRagGUI(QMainWindow):
         self.submit_button = QPushButton('提交问题')
         self.submit_button.setStyleSheet("""
             QPushButton {
-                background-color: #4CAF50;
-                color: white;
+                background-color: #a5dda5;
+                color: #5a5a5a;
                 border: none;
                 padding: 8px 16px;
                 border-radius: 4px;
                 font-weight: bold;
             }
             QPushButton:hover {
-                background-color: #45a049;
+                background-color: #b8e6b8;
             }
             QPushButton:pressed {
-                background-color: #3e8e41;
+                background-color: #93cc93;
             }
             QPushButton:disabled {
-                background-color: #cccccc;
-                color: #666666;
+                background-color: #e5e5e5;
+                color: #a0a0a0;
             }
         """)
         self.submit_button.clicked.connect(self.process_query)
@@ -332,18 +333,18 @@ class CesiumRagGUI(QMainWindow):
         self.clear_button = QPushButton('清除')
         self.clear_button.setStyleSheet("""
             QPushButton {
-                background-color: #f44336;
-                color: white;
+                background-color: #ffb6c1;
+                color: #5a5a5a;
                 border: none;
                 padding: 8px 16px;
                 border-radius: 4px;
                 font-weight: bold;
             }
             QPushButton:hover {
-                background-color: #e53935;
+                background-color: #ffc8d6;
             }
             QPushButton:pressed {
-                background-color: #d32f2f;
+                background-color: #ff9eb6;
             }
         """)
         self.clear_button.clicked.connect(self.clear_input)
@@ -371,24 +372,24 @@ class CesiumRagGUI(QMainWindow):
         self.chat_display.setPlaceholderText('对话内容将显示在这里...')
         self.chat_display.setStyleSheet("""
             QTextBrowser {
-                background-color: #1e1e1e;
-                color: #ffffff;
-                border: 1px solid #555;
+                background-color: #fff5f8;
+                color: #5a5a5a;
+                border: 1px solid #ffcce0;
                 border-radius: 5px;
                 padding: 10px;
-                selection-background-color: #3e4451;
+                selection-background-color: #ffd6e5;
             }
             QTextBrowser a {
-                color: #61afef;
+                color: #ff7eb3;
             }
             QTextBrowser code {
-                background-color: #2d2d2d;
+                background-color: #ffecf1;
                 padding: 2px 5px;
                 border-radius: 3px;
                 font-family: 'Consolas', 'Courier New', monospace;
             }
             QTextBrowser pre {
-                background-color: #2d2d2d;
+                background-color: #ffecf1;
                 padding: 10px;
                 border-radius: 5px;
                 overflow: auto;
@@ -398,7 +399,7 @@ class CesiumRagGUI(QMainWindow):
         
         # 添加状态指示
         self.status_label = QLabel('就绪')
-        self.status_label.setStyleSheet("font-style: italic; color: #999999;")
+        self.status_label.setStyleSheet("font-style: italic; color: #ff9eb6;")
         content_layout.addWidget(self.status_label)
         
         # 创建分割器，使左右两个面板可以调整大小
@@ -626,39 +627,42 @@ class CesiumRagGUI(QMainWindow):
         <style>
             .message-container { margin-bottom: 20px; }
             .user-message { 
-                background-color: #2d2d2d; 
-                color: white; 
+                background-color: #ffecf1; 
+                color: #5a5a5a; 
                 padding: 10px 15px;
                 border-radius: 8px;
                 margin-left: 20px;
                 margin-right: 5px;
+                border: 1px solid #ffcce0;
             }
             .assistant-message { 
-                background-color: #3e4451; 
-                color: white; 
+                background-color: #e8f5e9; 
+                color: #5a5a5a; 
                 padding: 10px 15px;
                 border-radius: 8px;
                 margin-left: 5px;
                 margin-right: 20px;
+                border: 1px solid #c8e6c9;
             }
             .timestamp {
                 font-size: 0.8em;
-                color: #999;
+                color: #ff9eb6;
                 margin-top: 3px;
                 text-align: right;
             }
             code {
-                background-color: #2d2d2d;
+                background-color: #fff5f8;
                 padding: 0.2em 0.4em;
                 border-radius: 3px;
                 font-family: 'Consolas', 'Courier New', monospace;
             }
             pre {
-                background-color: #212121;
+                background-color: #fff5f8;
                 padding: 10px;
                 border-radius: 5px;
                 overflow: auto;
                 margin: 10px 0;
+                border: 1px solid #ffcce0;
             }
             pre code {
                 background-color: transparent;
@@ -673,14 +677,14 @@ class CesiumRagGUI(QMainWindow):
                 width: 100%;
             }
             table, th, td {
-                border: 1px solid #444;
+                border: 1px solid #ffcce0;
             }
             th, td {
                 padding: 8px;
                 text-align: left;
             }
             th {
-                background-color: #333;
+                background-color: #fff0f5;
             }
         </style>
         """
