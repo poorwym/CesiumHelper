@@ -2,16 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import json
 import markdown
 from mdx_math import MathExtension
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                             QHBoxLayout, QTextEdit, QPushButton, QLabel, 
                             QSplitter, QFrame, QStyleFactory, QProgressBar,
                             QListWidget, QListWidgetItem, QMenu, QAction, QInputDialog,
-                            QMessageBox, QDialog, QLineEdit, QDateEdit, QComboBox, QDialogButtonBox)
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize, QUrl
-from PyQt5.QtGui import QFont, QIcon, QPalette, QColor
+                            QMessageBox, QDialog, QLineEdit, QDateEdit, QComboBox, QDialogButtonBox, QSizePolicy)
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize, QUrl, QRectF
+from PyQt5.QtGui import QFont, QIcon, QPalette, QColor, QPainterPath, QRegion
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 # 导入flow模块
@@ -19,6 +18,25 @@ import flow
 # 导入对话管理器
 from conversations_manager import ConversationsManager
 from datetime import datetime
+
+class RoundedWebEngineView(QWebEngineView):
+    def __init__(self, corner_radius=7, parent=None):
+        super().__init__(parent)
+        self.corner_radius = corner_radius
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        
+        # 1. 根据控件的实际大小，创建一个QPainterPath
+        rect = QRectF(self.rect())
+        path = QPainterPath()
+        path.addRoundedRect(rect, self.corner_radius, self.corner_radius)
+        
+        # 2. 将QPainterPath转为QRegion
+        region = QRegion(path.toFillPolygon().toPolygon())
+        
+        # 3. 设置QWebEngineView的蒙版
+        self.setMask(region)
 
 # 处理线程
 class ProcessingThread(QThread):
@@ -263,6 +281,7 @@ class CesiumRagGUI(QMainWindow):
         title_font.setPointSize(16)
         title_font.setBold(True)
         title_label.setFont(title_font)
+        title_label.setFixedHeight(50)  # 设置固定高度为50像素
         content_layout.addWidget(title_label)
         
         # 创建分隔线
@@ -279,10 +298,12 @@ class CesiumRagGUI(QMainWindow):
         title_font.setBold(True)
         self.conversation_title_label.setFont(title_font)
         self.conversation_title_label.setStyleSheet("color: #ff7eb3;")
+        self.conversation_title_label.setFixedHeight(40)  # 设置固定高度为40像素
         content_layout.addWidget(self.conversation_title_label)
         
         # 创建输入区域
         input_label = QLabel('请输入您的Cesium相关问题:')
+        input_label.setFixedHeight(40)  # 设置固定高度为40像素
         content_layout.addWidget(input_label)
         
         self.input_text = QTextEdit()
@@ -358,19 +379,15 @@ class CesiumRagGUI(QMainWindow):
         self.loading_animation = LoadingAnimation()
         content_layout.addWidget(self.loading_animation)
         
-        # 创建分隔线
-        line2 = QFrame()
-        line2.setFrameShape(QFrame.HLine)
-        line2.setFrameShadow(QFrame.Sunken)
-        content_layout.addWidget(line2)
-        
         # 创建对话区域标签
         chat_area_label = QLabel('对话内容:')
+        chat_area_label.setFixedHeight(40)  # 设置固定高度为40像素
         content_layout.addWidget(chat_area_label)
         
         # 创建统一的对话显示区域 - 使用QWebEngineView代替QTextBrowser
-        self.chat_display = QWebEngineView()
-        self.chat_display.setMinimumHeight(300)
+        self.chat_display = RoundedWebEngineView()
+        self.chat_display.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.chat_display.setStyleSheet("background-color: #fafafa; border-radius: 10px;")  # 添加圆角
         content_layout.addWidget(self.chat_display)
         
         # 添加状态指示
@@ -607,7 +624,8 @@ class CesiumRagGUI(QMainWindow):
                     font-family: Arial, sans-serif;
                     margin: 0;
                     padding: 10px;
-                    background-color: #fff5f8;
+                    background-color: #fafafa;
+                    border-radius: 10px;
                 }
                 .message-container { margin-bottom: 20px; }
                 .user-message { 
