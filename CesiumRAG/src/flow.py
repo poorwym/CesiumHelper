@@ -96,12 +96,52 @@ def process_query(query, status_callback=None, progress_callback=None, conversat
     api_key = config.get("llm.openai_api_key")
 
     # 初始化各节点
-    api_query_node = APIQueryNode(node_id="api_query_node", config={"model": llm_model_name, "base_url": base_url, "prompt_template": prompt_template, "api_key": api_key})
-    embedding_node = EmbeddingNode(node_id="embedding_node", config={"model": embedding_model_name, "base_url": base_url, "api_key": api_key})
-    vectordb_node = VectorDBNode(node_id="vectordb_node", config={"persist_directory": persist_dir, "base_url": base_url, "api_key": api_key})
-    retriever_node = RetrieverNode(node_id="retriever_node")
-    llm_node = LLMNode(node_id="llm_node", config={"model": llm_model_name, "base_url": base_url, "prompt_template": prompt_template, "api_key": api_key})
-    output_node = OutputNode(node_id="output_node")
+    api_query_node = APIQueryNode(
+        node_id="api_query_node", 
+        config={
+            "model": llm_model_name,
+            "base_url": base_url,
+            "prompt_template": prompt_template,
+            "api_key": api_key
+        }
+    )
+    # 嵌入节点
+    embedding_node = EmbeddingNode(
+        node_id="embedding_node",
+        config={
+            "model": embedding_model_name,
+            "base_url": base_url,
+            "api_key": api_key
+        }
+    )
+    # 向量数据库节点
+    vectordb_node = VectorDBNode(
+        node_id="vectordb_node",
+        config={
+            "model": embedding_model_name,
+            "persist_directory": persist_dir,
+            "base_url": base_url,
+            "api_key": api_key
+        }
+    )
+    # 检索节点
+    retriever_node = RetrieverNode(
+        node_id="retriever_node"
+    )
+    # LLM节点
+    llm_node = LLMNode(
+        node_id="llm_node",
+        config={
+            "model": llm_model_name,
+            "base_url": base_url,
+            "prompt_template": prompt_template,
+            "api_key": api_key
+        }
+    )
+    # 输出节点
+    output_node = OutputNode(
+        node_id="output_node"
+    )
 
     # 构造输入
     input_data = {
@@ -114,30 +154,54 @@ def process_query(query, status_callback=None, progress_callback=None, conversat
     # 按顺序执行
     if status_callback: status_callback("正在查询相关API...")
     if progress_callback: progress_callback(20)
-    data_after_api_query = api_query_node.process(input_data)
+    try:
+        data_after_api_query = api_query_node.process(input_data)
+    except Exception as e:
+        print(f"API查询失败: {e}")
+        return "API查询失败"
 
     if status_callback: status_callback("正在生成嵌入向量...")
     if progress_callback: progress_callback(40)
     api_description = data_after_api_query["api_description"]
-    data_after_embedding = embedding_node.process({"api_description": api_description})
+    try:
+        data_after_embedding = embedding_node.process({"api_description": api_description})
+    except Exception as e:
+        print(f"嵌入向量生成失败: {e}")
+        return "嵌入向量生成失败"
     
     if status_callback: status_callback("正在向量数据库中检索相关文档...")
     if progress_callback: progress_callback(60)
     embeddings = data_after_embedding["embeddings"]
-    data_after_vdb = vectordb_node.process({"embeddings": embeddings})
+    try:
+        data_after_vdb = vectordb_node.process({"embeddings": embeddings})
+    except Exception as e:
+        print(f"向量数据库检索失败: {e}")
+        return "向量数据库检索失败"
     
     if status_callback: status_callback("正在处理检索结果...")
     if progress_callback: progress_callback(70)
     retrieved_docs = data_after_vdb["retrieved_docs"]
-    data_after_retriever = retriever_node.process({"retrieved_docs": retrieved_docs})
+    try:
+        data_after_retriever = retriever_node.process({"retrieved_docs": retrieved_docs})
+    except Exception as e:
+        print(f"检索结果处理失败: {e}")
+        return "检索结果处理失败"
     
     if status_callback: status_callback("AI正在生成回答...")
     if progress_callback: progress_callback(80)
     context += f"检索结果: {data_after_retriever['context']}\n"
-    data_after_llm = llm_node.process({"context": context, "user_query": original_user_query})
+    try:
+        data_after_llm = llm_node.process({"context": context, "user_query": original_user_query})
+    except Exception as e:
+        print(f"LLM生成失败: {e}")
+        return "LLM生成失败"
     
     if progress_callback: progress_callback(95)
-    final_result = output_node.process({"input": data_after_llm["answer"]})
+    try:
+        final_result = output_node.process({"input": data_after_llm["answer"]})
+    except Exception as e:
+        print(f"输出处理失败: {e}")
+        return "输出处理失败"
 
     # 更新对话
     conversations_manager.update_conversation(conversation_id, {

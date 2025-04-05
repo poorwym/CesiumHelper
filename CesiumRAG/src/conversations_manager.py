@@ -2,17 +2,16 @@ import os
 import json
 from datetime import datetime
 from typing import List, Dict, Optional, Union
-from pathlib import Path
 import uuid
 
 class ConversationsManager:
     def __init__(self, conversations_dir=None):
         # 自动定位项目根目录
-        project_root = Path(__file__).resolve().parents[1]  # src/conversation/ --> src/ --> 根目录
-        default_dir = project_root / "data" / "conversations"
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # src/conversation/ --> src/ --> 根目录
+        default_dir = os.path.join(project_root, "data", "conversations")
 
         # 使用传入路径或默认路径
-        self.conversations_dir = Path(conversations_dir).resolve() if conversations_dir else default_dir
+        self.conversations_dir = os.path.abspath(conversations_dir) if conversations_dir else default_dir
 
         self.conversations: Dict[str, Dict] = {}
         self._ensure_conversations_dir()
@@ -21,7 +20,7 @@ class ConversationsManager:
     def _ensure_conversations_dir(self):
         """确保对话目录存在"""
         try:
-            Path(self.conversations_dir).mkdir(parents=True, exist_ok=True)
+            os.makedirs(self.conversations_dir, exist_ok=True)
             print(f"对话目录已创建: {self.conversations_dir}")
         except Exception as e:
             raise RuntimeError(f"无法创建对话目录 {self.conversations_dir}: {str(e)}")

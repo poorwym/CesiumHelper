@@ -5,6 +5,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 import openai
+import shutil
 
 
 
@@ -36,9 +37,9 @@ def split_documents(docs, chunk_size=500, chunk_overlap=50):
     return splitter.split_documents(docs)
 
 # 3. 构建 embedding 并持久化
-def build_vectorstore(docs, persist_path="./chroma_db"):
+def build_vectorstore(docs, persist_path, embeddings_model):
     embeddings = OpenAIEmbeddings(
-        model="text-embedding-3-small",
+        model=embeddings_model,
         base_url="https://api.chatanywhere.tech/v1",
         api_key=os.getenv("OPENAI_API_KEY")
     )
@@ -50,9 +51,24 @@ from utils.config_loader import ConfigLoader
 
 config = ConfigLoader()
 
-# === 主流程 ===
-folder_path = "./data/curated"  # 替换为你自己的文档文件夹路径
-persist_path = "./data/chroma_openai"
+embeddings_model = config.get("embedding.model")
+
+folder_path = os.path.join(config.project_root, "data", "curated")
+persist_path = os.path.join(config.project_root, "data", "chroma_openai", embeddings_model)
+if os.path.exists(persist_path):
+    print("向量数据库已存在，请选择是否删除[y/N]")
+    choice = input("请输入你的选择: ")
+    if choice == "y":
+        shutil.rmtree(persist_path)
+        print("向量数据库已删除")
+    else:
+        print("已取消删除")
+        exit()
+
+print("embeddings_model: ", embeddings_model)
+print("folder_path: ", str(folder_path))
+print("persist_path: ", str(persist_path))
+
 
 print("加载文件...")
 raw_docs = load_documents_from_folder(folder_path)
@@ -61,6 +77,6 @@ print(f"共加载 {len(raw_docs)} 篇文档，开始切分...")
 split_docs = split_documents(raw_docs)
 
 print(f"共切分为 {len(split_docs)} 段，开始构建向量库并持久化...")
-build_vectorstore(split_docs, persist_path)
+build_vectorstore(split_docs, persist_path, embeddings_model)
 
 print("构建完毕，向量数据库已持久化。")
