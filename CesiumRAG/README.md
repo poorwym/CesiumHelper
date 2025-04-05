@@ -32,8 +32,17 @@ conda activate cesiumrag
 - 向量数据库: 设置Chroma持久化目录
 
 请在运行程序前确保已正确配置`config.json`。
-（默认使用了可怜的wym的apikey，要配置自己的可以参考[nodes文档](doc/nodes.md).
+（默认使用了可怜的wym的apikey，要配置自己的可以参考[nodes文档](doc/nodes.md)）
 
+### 可用模型配置
+
+配置文件中包含多种预设的模型配置：
+
+- GPT系列: gpt-3.5-turbo, gpt-4, gpt-4.5-preview等
+- OpenAI O系列: o1-mini, o1-preview, o3-mini, o1等
+- 其他模型: Claude, Gemini, DeepSeek, Grok等
+
+可以根据需要在`configs/config.json`中选择和配置适合的模型。
 
 ## 使用方法
 

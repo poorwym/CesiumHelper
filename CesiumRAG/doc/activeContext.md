@@ -19,3 +19,14 @@
 - 修正了VectorDBNode的配置参数和处理逻辑说明
 - 简化了各节点的输入输出格式，移除了status和message字段，符合当前实现
 - 更新了节点间数据传递的详细信息 
+
+## 2025-05-04: 扩展default模型配置
+
+- 在`configs/config.json`中添加了多个默认模型配置
+- 添加了GPT系列模型（gpt-3.5-turbo、gpt-4.5-preview等）
+- 添加了OpenAI最新的O系列模型（o1-mini、o1-preview、o3-mini、o1）
+- 添加了gpt-4o和gpt-4o-mini模型配置
+- 添加了Claude模型配置（claude-3-7-sonnet、claude-3-5-sonnet）
+- 添加了Gemini模型配置（gemini-1.5-pro、gemini-1.5-flash）
+- 添加了DeepSeek和Grok模型配置
+- 所有新增配置保持与原default_gpt_4一致的结构 

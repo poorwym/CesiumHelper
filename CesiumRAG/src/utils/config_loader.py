@@ -10,12 +10,14 @@ class ConfigLoader:
         env_path = os.path.join(self.project_root, 'configs', '.env')
         load_dotenv(env_path)
         try:
-            print(os.getenv("OPENAI_API_KEY"))
+            print("OPENAI_API_KEY: ", os.getenv("OPENAI_API_KEY"))
         except Exception as e:
             print(e)
         
         if config_path is None:
             config_path = os.path.join(self.project_root, 'configs', 'config.json')
+        else:
+            config_path = os.path.join(self.project_root, config_path)
         self.config = self._load_config(config_path)
 
     def _load_config(self, path):
@@ -35,7 +37,7 @@ class ConfigLoader:
             return obj
 
     def get(self, key, default=None):
-        """支持通过点号路径访问嵌套字段，如 'llm.model'"""
+        """ 支持通过点号路径访问嵌套字段，如 'llm.model' """
         parts = key.split(".")
         val = self.config
         for part in parts:
