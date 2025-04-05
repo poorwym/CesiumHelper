@@ -35,55 +35,31 @@
 ### 配置参数
 ```python
 {
-    "model_name": str,        # 模型名称（默认：gpt-4）
-    "openai_api_key": str,    # OpenAI API密钥
-    "temperature": float,     # 温度参数（默认：0）
+    "model": str,             # 模型名称（默认：gpt-4-turbo-preview）
+    "temperature": float,     # 温度参数（默认：0.7）
     "base_url": str,          # API基础URL（默认：https://api.chatanywhere.tech/v1）
-    "prompt_template": str    # 自定义提示词模板（可选）
+    "prompt_template": str    # 自定义提示词模板（默认：{user_query}）
 }
 ```
 
 ### Prompt模板
-LLM节点支持自定义提示词模板，可以通过配置参数`prompt_template`来设置。模板中可以使用以下变量：
+LLM节点支持自定义提示词模板，模板中可以使用以下变量：
 - `{context}`: 上下文信息
-- `{original_user_query}`: 用户问题
-
-默认模板如下：
-```
-请基于以下上下文回答用户关于Cesium的问题：
-
-上下文:
-{context}
-
-问题:
-{original_user_query}
-
-请使用Markdown格式来组织你的回答，包括：
-1. 使用适当的标题层级(##, ###)
-2. 使用代码块(```)展示代码示例
-3. 使用列表和表格来组织信息
-4. 对重要概念使用粗体或斜体
-5. 使用适当的分隔符分隔不同部分
-
-请确保你的回答清晰、准确且容易理解。如果上下文中没有足够信息，请明确指出。
-```
+- `{user_query}`: 用户问题
 
 ### 输入
 ```python
 {
-    "context": str,              # 上下文信息
-    "original_user_query": str   # 用户问题
+    "context": str,        # 上下文信息
+    "user_query": str      # 用户问题
 }
 ```
 
 ### 输出
 ```python
 {
-    "status": str,      # 处理状态
-    "message": str,     # 状态信息
-    "data": {
-        "answer": str   # LLM生成的回答
-    }
+    "answer": str,         # LLM生成的回答
+    "request_id": str      # 请求ID（基于时间戳生成）
 }
 ```
 
@@ -111,20 +87,16 @@ LLM节点支持自定义提示词模板，可以通过配置参数`prompt_templa
 ### 输入
 ```python
 {
-    "user_query": str           # 用户的原始查询
+    "user_query": str           # 用户的查询
 }
 ```
 
 ### 输出
 ```python
 {
-    "status": str,              # 处理状态
-    "message": str,             # 状态信息
-    "data": {
-        "api_description": str, # 分析出的API描述
-        "original_user_query": str,  # 原始用户查询
-        "user_query": str       # 用户的查询
-    }
+    "api_description": str,     # 分析出的API描述
+    "answer": str,              # 与api_description相同，保持与LLMNode输出一致
+    "request_id": str           # 请求ID（基于时间戳生成）
 }
 ```
 
@@ -135,8 +107,7 @@ LLM节点支持自定义提示词模板，可以通过配置参数`prompt_templa
 ### 配置参数
 ```python
 {
-    "model_name": str,        # 模型名称（默认：text-embedding-ada-002）
-    "openai_api_key": str,    # OpenAI API密钥
+    "model": str,             # 模型名称（默认：text-embedding-3-small）
     "base_url": str           # API基础URL（默认：https://api.chatanywhere.tech/v1）
 }
 ```
@@ -144,22 +115,15 @@ LLM节点支持自定义提示词模板，可以通过配置参数`prompt_templa
 ### 输入
 ```python
 {
-    "api_description": str,       # 需要转换为向量的API描述
-    "original_user_query": str,   # 原始用户查询
-    "user_query": str            # 用户查询
+    "api_description": str    # 需要转换为向量的API描述
 }
 ```
 
 ### 输出
 ```python
 {
-    "status": str,              # 处理状态
-    "message": str,             # 状态信息
-    "data": {
-        "embeddings": list,     # API描述的向量表示列表
-        "original_user_query": str,  # 原始用户查询
-        "user_query": str       # 用户查询
-    }
+    "embeddings": list,       # API描述的向量表示列表
+    "api_description": str    # 原始API描述
 }
 ```
 
@@ -170,29 +134,22 @@ LLM节点支持自定义提示词模板，可以通过配置参数`prompt_templa
 ### 配置参数
 ```python
 {
-    "persist_directory": str    # 向量数据库持久化目录（默认：./chroma_data）
+    "persist_directory": str,  # 向量数据库持久化目录路径
+    "model": str               # embedding模型名称（用于定位正确的向量数据库目录）
 }
 ```
 
 ### 输入
 ```python
 {
-    "embeddings": list,         # 查询向量列表
-    "original_user_query": str, # 原始用户查询
-    "user_query": str          # 用户查询
+    "embeddings": list        # 查询向量列表
 }
 ```
 
 ### 输出
 ```python
 {
-    "status": str,              # 处理状态
-    "message": str,             # 状态信息
-    "data": {
-        "retrieved_docs": list, # 检索到的文档列表
-        "original_user_query": str,  # 原始用户查询
-        "user_query": str       # 用户查询
-    }
+    "retrieved_docs": list    # 检索到的文档列表（每个向量检索k=3条文档）
 }
 ```
 
@@ -203,22 +160,14 @@ LLM节点支持自定义提示词模板，可以通过配置参数`prompt_templa
 ### 输入
 ```python
 {
-    "retrieved_docs": list,     # 检索到的文档列表
-    "original_user_query": str, # 原始用户查询
-    "user_query": str          # 用户查询
+    "retrieved_docs": list    # 检索到的文档列表
 }
 ```
 
 ### 输出
 ```python
 {
-    "status": str,              # 处理状态
-    "message": str,             # 状态信息
-    "data": {
-        "context": str,         # 处理后的文档内容
-        "original_user_query": str,  # 原始用户查询
-        "user_query": str       # 用户查询
-    }
+    "context": str            # 处理后的文档内容（将所有文档内容合并为字符串）
 }
 ```
 
@@ -229,18 +178,14 @@ LLM节点支持自定义提示词模板，可以通过配置参数`prompt_templa
 ### 输入
 ```python
 {
-    "answer": str    # LLM生成的回答
+    "input": str              # 输入文本（通常是LLM生成的回答）
 }
 ```
 
 ### 输出
 ```python
 {
-    "status": str,              # 处理状态
-    "message": str,             # 状态信息
-    "data": {
-        "final_output": str     # 格式化后的最终输出
-    }
+    "final_output": str       # 格式化后的最终输出
 }
 ```
 
