@@ -9,6 +9,10 @@ class ConfigLoader:
         # 加载 .env 文件
         env_path = os.path.join(self.project_root, 'configs', '.env')
         load_dotenv(env_path)
+        try:
+            print(os.getenv("OPENAI_API_KEY"))
+        except Exception as e:
+            print(e)
         
         if config_path is None:
             config_path = os.path.join(self.project_root, 'configs', 'config.json')

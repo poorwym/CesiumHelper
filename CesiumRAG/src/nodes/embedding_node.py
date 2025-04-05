@@ -32,6 +32,12 @@ class EmbeddingNode(Node):
         # 处理AIMessage对象
         if hasattr(api_description, 'content'):
             api_description = api_description.content
+
+        if api_description == "无明确的 API 相关描述":
+            return {
+                "embeddings": [],
+                "api_description": api_description
+            }
         
         apis = api_description.split(",")
         embeddings = []

@@ -6,8 +6,7 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 import openai
 
-# 加载环境变量
-load_dotenv()
+
 
 # 设置 OpenAI API 密钥和基础 URL
 openai.base_url = "https://api.chatanywhere.tech/v1"
@@ -46,6 +45,10 @@ def build_vectorstore(docs, persist_path="./chroma_db"):
     vectordb = Chroma.from_documents(documents=docs, embedding=embeddings, persist_directory=persist_path)
     vectordb.persist()
     return vectordb
+
+from utils.config_loader import ConfigLoader
+
+config = ConfigLoader()
 
 # === 主流程 ===
 folder_path = "./data/curated"  # 替换为你自己的文档文件夹路径
