@@ -8,6 +8,5 @@ curated/
 .env.test.local
 .env.production.local
 
-conversations/
-
+data/
 test_os.py
