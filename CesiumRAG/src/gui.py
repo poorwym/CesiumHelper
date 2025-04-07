@@ -620,43 +620,55 @@ class CesiumRagGUI(QMainWindow):
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
+                * {
+                    box-sizing: border-box;
+                }
                 body {
                     font-family: Arial, sans-serif;
                     margin: 0;
                     padding: 10px;
                     background-color: #fafafa;
-                    border-radius: 10px;
                 }
-                .message-container { margin-bottom: 20px; }
+                .message-container {
+                    margin-bottom: 20px;
+                    width: 100%;
+                    overflow: hidden;
+                }
                 .user-message { 
-                    background-color: #ffecf1; 
-                    color: #5a5a5a; 
+                    background-color: #ffecf1;
+                    color: #5a5a5a;
                     padding: 10px 15px;
                     border-radius: 8px;
-                    margin-left: 20px;
-                    margin-right: 5px;
+                    margin: 0 20px 0 5px;
                     border: 1px solid #ffcce0;
+                    font-family: monospace;
+                    white-space: pre-wrap;
+                    word-break: break-word;
+                    width: calc(100% - 25px);
+                    float: right;
                 }
                 .assistant-message { 
-                    background-color: #e8f5e9; 
-                    color: #5a5a5a; 
+                    background-color: #e8f5e9;
+                    color: #5a5a5a;
                     padding: 10px 15px;
                     border-radius: 8px;
-                    margin-left: 5px;
-                    margin-right: 20px;
+                    margin: 0 5px 0 20px;
                     border: 1px solid #c8e6c9;
+                    width: calc(100% - 25px);
+                    float: left;
                 }
                 .timestamp {
                     font-size: 0.8em;
                     color: #ff9eb6;
                     margin-top: 3px;
                     text-align: right;
+                    clear: both;
                 }
                 code {
                     background-color: #fff5f8;
                     padding: 0.2em 0.4em;
                     border-radius: 3px;
-                    font-family: 'Consolas', 'Courier New', monospace;
+                    font-family: monospace;
                 }
                 pre {
                     background-color: #fff5f8;
@@ -688,18 +700,6 @@ class CesiumRagGUI(QMainWindow):
                 th {
                     background-color: #fff0f5;
                 }
-                .math {
-                    font-size: 1.1em;
-                }
-                .math-inline {
-                    display: inline-block;
-                    margin: 0 0.2em;
-                }
-                .math-display {
-                    display: block;
-                    margin: 0.5em 0;
-                    text-align: center;
-                }
             </style>
             <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_HTML"></script>
             <script type="text/x-mathjax-config">
@@ -729,9 +729,10 @@ class CesiumRagGUI(QMainWindow):
                 except:
                     time_str = timestamp
             
-            # 转换Markdown内容为HTML（如果是assistant消息）
+            # 内容处理
             if role == 'assistant':
                 try:
+                    # 仅为assistant消息转换Markdown内容为HTML
                     content_html = markdown.markdown(
                         content,
                         extensions=[
@@ -746,7 +747,8 @@ class CesiumRagGUI(QMainWindow):
                 except:
                     content_html = content
             else:
-                content_html = content.replace('\n', '<br>')
+                # 用户消息显示为纯文本，对特殊HTML字符进行转义，保留原始格式
+                content_html = content.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
             
             # 添加消息
             class_name = f"{role}-message"

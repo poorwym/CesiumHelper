@@ -13,11 +13,21 @@ class ConfigLoader:
             print("OPENAI_API_KEY: ", os.getenv("OPENAI_API_KEY"))
         except Exception as e:
             print(e)
-        
+
+        # 加载 embedding_model_list.json
+        embedding_model_path = os.path.join(self.project_root, 'configs', 'embedding_model_list.json')
+
+        self.embedding_model_list = self._load_config(embedding_model_path)
+        # 加载 llm_list.json
+        llm_model_path = os.path.join(self.project_root, 'configs', 'llm_list.json')
+        self.llm_model_list = self._load_config(llm_model_path)
+
+        # 加载 config.json
         if config_path is None:
             config_path = os.path.join(self.project_root, 'configs', 'config.json')
         else:
             config_path = os.path.join(self.project_root, config_path)
+            
         self.config = self._load_config(config_path)
 
     def _load_config(self, path):

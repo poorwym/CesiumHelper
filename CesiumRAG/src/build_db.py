@@ -1,5 +1,4 @@
 import os
-from dotenv import load_dotenv
 from langchain_community.document_loaders import DirectoryLoader, TextLoader, UnstructuredPDFLoader, UnstructuredWordDocumentLoader, UnstructuredMarkdownLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
@@ -51,10 +50,19 @@ from utils.config_loader import ConfigLoader
 
 config = ConfigLoader()
 
-embeddings_model = config.get("embedding.model")
+print("请选择embedding模型:")
+for i, embedding_model in enumerate(config.embedding_model_list):
+    print(f"{i}: {embedding_model}")
+
+embedding_model_name = str(input("请输入你的选择: "))
+embeddings_model = config.embedding_model_list[embedding_model_name]
+print("embeddings_model: ", embeddings_model)
+
+db_name = str(input("请输入向量数据库名称: "))
+print("db_name: ", db_name)
 
 folder_path = os.path.join(config.project_root, "data", "curated")
-persist_path = os.path.join(config.project_root, "data", "chroma_openai", embeddings_model)
+persist_path = os.path.join(config.project_root, "data", "chroma_openai", db_name, embeddings_model['model'])
 if os.path.exists(persist_path):
     print("向量数据库已存在，请选择是否删除[y/N]")
     choice = input("请输入你的选择: ")
