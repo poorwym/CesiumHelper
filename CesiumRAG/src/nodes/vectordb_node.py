@@ -10,10 +10,12 @@ class VectorDBNode(Node):
         用于连接向量数据库(如Chroma)的节点。
         """
         super().__init__(node_id, config)
-        persist_directory = self.config.get("persist_directory", os.path.join(config.get("persist_directory"), config.get("model")))
+        persist_directory = os.path.join(config.get("persist_directory"), config.get("model"))
 
         if not os.path.exists(persist_directory):
             raise ValueError(f"向量数据库不存在: {persist_directory}")
+        else:
+            print(f"向量数据库存在: {persist_directory}")
         
         # 初始化你的向量数据库, 例如Chroma
         self.vectordb = Chroma(
